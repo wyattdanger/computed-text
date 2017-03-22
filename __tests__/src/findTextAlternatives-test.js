@@ -142,4 +142,23 @@ describe('findTextAlternatives', () => {
     expect(Object.keys(textAlternatives).length).toBe(0);
     expect(result).toBe(null);
   });
+
+  test('foo', () => {
+    document.body.innerHTML = `
+    <h1>Hello World</h1>
+    <p>is this thing on?</p>
+    <img src="foo.jpg" alt="Foo" />
+    <form>
+      <input type="text" aria-label="Aria Label" id="bar" value="Bar" />
+      <textarea aria-label="Why" value=""></textarea>
+      <button type="submit">Submit</button>
+    </form>
+    <div role="presentation">Ignore Me?</div>
+    Text Node
+    `;
+    const textAlternatives = {};
+    const result = findTextAlternatives(document.body, textAlternatives);
+    expect(result).toBe('Hello World is this thing on? Foo Bar Submit Text Node');
+    console.log(textAlternatives);
+  });
 });

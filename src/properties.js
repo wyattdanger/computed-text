@@ -2,15 +2,18 @@
 
 import { ARIA_ROLES } from './constants';
 import { asElement, parentElement } from './domUtils';
-import { elementIsAriaWidget, elementIsHtmlControl, isElementOrAncestorHidden, matchSelector } from './utils';
+import { elementIsAriaWidget, elementIsHtmlControl, isElementOrAncestorHidden } from './utils';
 
-const findTextAlternatives = (node, textAlternatives, recursive = false, force) => {
+const findTextAlternatives = (node, textAlternatives, recursive = false, force = false) => {
+  console.log(recursive, force);
   const element = asElement(node);
   if (!element) { return null; }
 
   // 1. Skip hidden elements unless the author specifies to use them via an aria-labelledby or
   // aria-describedby being used in the current computation.
-  if (!force && isElementOrAncestorHidden(element)) { return null; }
+  if (!force && isElementOrAncestorHidden(element)) {
+    return null;
+  }
 
   // if this is a text node, just return text content.
   if (node.nodeType === Node.TEXT_NODE) {
@@ -23,7 +26,7 @@ const findTextAlternatives = (node, textAlternatives, recursive = false, force) 
     return node.textContent;
   }
 
-  let computedName = null;
+  let computedName;
 
   if (!recursive) {
     // 2A. The aria-labelledby attribute takes precedence as the element's text alternative
@@ -239,7 +242,7 @@ const getTextFromHostLanguageAttributes = (
   element, textAlternatives = {}, existingComputedname, recursive,
 ) => {
   let computedName = existingComputedname;
-  if (matchSelector(element, 'img') && element.hasAttribute('alt')) {
+  if (element.matches('img') && element.hasAttribute('alt')) {
     const altValue = {};
     altValue.type = 'string';
     altValue.valid = true;
@@ -253,7 +256,7 @@ const getTextFromHostLanguageAttributes = (
     'textarea:not([disabled])',
     'button:not([disabled])',
     'video:not([disabled])'].join(', ');
-  if (matchSelector(element, controlsSelector) && !recursive) {
+  if (element.matches(controlsSelector) && !recursive) {
     if (element.hasAttribute('id')) {
       const labelForQuerySelector = `label[for="${element.id}"]`;
       const labelsFor = document.querySelectorAll(labelForQuerySelector);
@@ -310,7 +313,7 @@ const getTextFromHostLanguageAttributes = (
       textAlternatives.labelWrapped = labelWrappedValue;
     }
       // If all else fails input of type image can fall back to its alt text
-    if (matchSelector(element, 'input[type="image"]') && element.hasAttribute('alt')) {
+    if (element.matches('input[type="image"]') && element.hasAttribute('alt')) {
       const altValue = {};
       altValue.type = 'string';
       altValue.valid = true;
