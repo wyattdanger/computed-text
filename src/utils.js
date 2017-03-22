@@ -61,8 +61,25 @@ const isElementOrAncestorHidden = (element) => {
   return false;
 };
 
+const matchSelector = (element, selector) => {
+  if (element.matches) {
+    return element.matches(selector);
+  }
+  if (element.webkitMatchesSelector) {
+    return element.webkitMatchesSelector(selector);
+  }
+  if (element.mozMatchesSelector) {
+    return element.mozMatchesSelector(selector);
+  }
+  if (element.msMatchesSelector) {
+    return element.msMatchesSelector(selector);
+  }
+  return false;
+};
+
 export default {
   elementIsAriaWidget,
   elementIsHtmlControl,
   isElementOrAncestorHidden,
+  matchSelector,
 };
