@@ -16,6 +16,7 @@ const getLastWord = (text) => {
 
 const getTextFromAriaLabelledby = (element, textAlternatives) => {
   let computedName = null;
+
   if (!element.hasAttribute('aria-labelledby')) {
     return computedName;
   }
@@ -59,17 +60,19 @@ const getTextFromAriaLabelledby = (element, textAlternatives) => {
   return computedName;
 };
 
-const getTextFromHostLanguageAttributes = (
-  element, textAlternatives = {}, existingComputedname, recursive,
-) => {
+const getTextFromHostLanguageAttributes = (element, existingComputedname = null, recursive) => {
   let computedName = existingComputedname;
+
+  if (element.hasAttribute('aria-label')) {
+    return element.getAttribute('aria-label');
+  }
+
   if (element.matches('img') && element.hasAttribute('alt')) {
-    const altValue = {};
-    altValue.type = 'string';
-    altValue.valid = true;
-    altValue.text = element.getAttribute('alt');
-    if (computedName) { altValue.unused = true; } else { computedName = altValue.text; }
-    textAlternatives.alt = altValue;
+    computedName = element.getAttribute('alt');
+  }
+
+  if (element.matches('img') && !element.hasAttribute('alt')) {
+    computedName = element.getAttribute('title') || element.getAttribute('src');
   }
 
   const controlsSelector = ['input:not([type="hidden"]):not([disabled])',
@@ -77,6 +80,7 @@ const getTextFromHostLanguageAttributes = (
     'textarea:not([disabled])',
     'button:not([disabled])',
     'video:not([disabled])'].join(', ');
+
   if (element.matches(controlsSelector) && !recursive) {
     if (element.hasAttribute('id')) {
       const labelForQuerySelector = `label[for="${element.id}"]`;
@@ -106,7 +110,6 @@ const getTextFromHostLanguageAttributes = (
         } else {
           computedName = labelForValue.text;
         }
-        textAlternatives.labelFor = labelForValue;
       }
     }
 
@@ -131,19 +134,13 @@ const getTextFromHostLanguageAttributes = (
       } else {
         computedName = labelWrappedValue.text;
       }
-      textAlternatives.labelWrapped = labelWrappedValue;
     }
-      // If all else fails input of type image can fall back to its alt text
     if (element.matches('input[type="image"]') && element.hasAttribute('alt')) {
       const altValue = {};
       altValue.type = 'string';
       altValue.valid = true;
       altValue.text = element.getAttribute('alt');
       if (computedName) { altValue.unused = true; } else { computedName = altValue.text; }
-      textAlternatives.alt = altValue;
-    }
-    if (!Object.keys(textAlternatives).length) {
-      textAlternatives.noLabel = true;
     }
   }
   return computedName;

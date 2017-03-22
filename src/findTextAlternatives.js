@@ -6,7 +6,7 @@ import { elementIsAriaWidget, elementIsHtmlControl, isElementOrAncestorHidden } 
 import constants from './constants';
 
 
-const findTextAlternatives = (node, textAlternatives, recursive = false, force = false) => {
+const findTextAlternatives = (node, textAlternatives = {}, recursive = false, force = false) => {
   const element = asElement(node);
 
   if (!element) {
@@ -21,12 +21,6 @@ const findTextAlternatives = (node, textAlternatives, recursive = false, force =
 
   // if this is a text node, just return text content.
   if (node.nodeType === Node.TEXT_NODE) {
-    const textContentValue = {};
-    textContentValue.type = 'text';
-    textContentValue.text = node.textContent;
-    textContentValue.lastWord = getLastWord(textContentValue.text);
-    textAlternatives.content = textContentValue;
-
     return node.textContent;
   }
 
@@ -59,10 +53,7 @@ const findTextAlternatives = (node, textAlternatives, recursive = false, force =
   // language attribute or element for associating a label, and use those mechanisms to determine
   // a text alternative.
   if (!element.hasAttribute('role') || element.getAttribute('role') !== 'presentation') {
-    computedName = getTextFromHostLanguageAttributes(element,
-                                                                    textAlternatives,
-                                                                    computedName,
-                                                                    recursive);
+    computedName = getTextFromHostLanguageAttributes(element, computedName, recursive);
   }
 
   // 2B (HTML version).
@@ -182,21 +173,9 @@ const findTextAlternatives = (node, textAlternatives, recursive = false, force =
   // 2D. The last resort is to use text from a tooltip attribute (such as the title attribute in
   // HTML). This is used only if nothing else, including subtree content, has provided results.
   if (element.hasAttribute('title')) {
-    const titleValue = {};
-    titleValue.type = 'string';
-    titleValue.valid = true;
-    titleValue.text = element.getAttribute('title');
-    titleValue.lastWord = getLastWord(titleValue.lastWord);
-    if (computedName) {
-      titleValue.unused = true;
-    } else {
-      computedName = titleValue.text;
+    if (!computedName) {
+      computedName = element.getAttribute('title');
     }
-    textAlternatives.title = titleValue;
-  }
-
-  if (Object.keys(textAlternatives).length === 0 && computedName === null) {
-    return null;
   }
 
   return computedName;

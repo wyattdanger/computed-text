@@ -14,20 +14,16 @@ describe('findTextAlternatives', () => {
   test('Image with no text alternative', () => {
     const img = document.body.appendChild(document.createElement('img'));
     img.src = 'smile.jpg';
-    const textAlternatives = {};
-    findTextAlternatives(img, textAlternatives);
-    expect(Object.keys(textAlternatives).length).toBe(0);
+    const result = findTextAlternatives(img);
+    expect(result).toBe('smile.jpg');
   });
 
   test('Image with alt text', () => {
     const img = document.body.appendChild(document.createElement('img'));
     img.src = 'smile.jpg';
     img.alt = 'Smile!';
-    const textAlternatives = {};
-    findTextAlternatives(img, textAlternatives);
-    expect(Object.keys(textAlternatives).length).toBe(1);
-    expect('alt' in textAlternatives).toBe(true);
-    expect('Smile!').toBe(textAlternatives.alt.text);
+    const result = findTextAlternatives(img);
+    expect(result).toBe('Smile!');
   });
 
   test('Input type image with alt text', () => {
@@ -35,22 +31,16 @@ describe('findTextAlternatives', () => {
     img.type = 'image';
     img.src = 'smile.jpg';
     img.alt = 'Smile!';
-    const textAlternatives = {};
-    findTextAlternatives(img, textAlternatives);
-    expect(Object.keys(textAlternatives).length).toBe(1);
-    expect('alt' in textAlternatives).toBe(true);
-    expect('Smile!').toBe(textAlternatives.alt.text);
+    const result = findTextAlternatives(img);
+    expect(result).toBe('Smile!');
   });
 
   test('Image with aria label', () => {
     const img = document.body.appendChild(document.createElement('img'));
     img.src = 'smile.jpg';
     img.setAttribute('aria-label', 'Smile!');
-    const textAlternatives = {};
-    findTextAlternatives(img, textAlternatives);
-    expect(Object.keys(textAlternatives).length).toBe(1);
-    expect('ariaLabel' in textAlternatives).toBe(true);
-    expect('Smile!').toBe(textAlternatives.ariaLabel.text);
+    const result = findTextAlternatives(img);
+    expect(result).toBe('Smile!');
   });
 
   test('Image with aria labelledby', () => {
@@ -71,11 +61,8 @@ describe('findTextAlternatives', () => {
     const img = document.body.appendChild(document.createElement('img'));
     img.src = 'smile.jpg';
     img.setAttribute('title', 'Smile!');
-    const textAlternatives = {};
-    findTextAlternatives(img, textAlternatives);
-    expect(Object.keys(textAlternatives).length).toBe(1);
-    expect('title' in textAlternatives).toBe(true);
-    expect('Smile!').toBe(textAlternatives.title.text);
+    const result = findTextAlternatives(img);
+    expect(result).toBe('Smile!');
   });
 
 
@@ -158,7 +145,6 @@ describe('findTextAlternatives', () => {
     `;
     const textAlternatives = {};
     const result = findTextAlternatives(document.body, textAlternatives);
-    expect(result).toBe('Hello World is this thing on? Foo Bar Submit Text Node');
-    console.log(textAlternatives);
+    expect(result).toBe('Hello World is this thing on? Foo Aria Label Why Submit Text Node');
   });
 });

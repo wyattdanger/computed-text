@@ -22,6 +22,6 @@ describe('getTextFromHostLanguageAttributes', () => {
     const targetNode = document.createElement('input');
     targetNode.setAttribute('id', '123_user');
     document.body.appendChild(targetNode);
-    expect(getTextFromHostLanguageAttributes(targetNode, {}, null)).toBe(null);
+    expect(getTextFromHostLanguageAttributes(targetNode)).toBe(null);
   });
 });
