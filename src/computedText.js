@@ -6,7 +6,7 @@ import { elementIsAriaWidget, elementIsHtmlControl, isElementOrAncestorHidden } 
 import constants from './constants';
 
 
-const computedText = (node, textAlternatives = {}, recursive = false, force = false) => {
+const computedText = (node, textAlternatives = {}, force = false) => {
   const element = asElement(node);
 
   if (!element) {
@@ -51,7 +51,7 @@ const computedText = (node, textAlternatives = {}, recursive = false, force = fa
   }
 
   // 2B (HTML version).
-  if (recursive && elementIsHtmlControl(element)) {
+  if (elementIsHtmlControl(element)) {
     const defaultView = element.ownerDocument.defaultView;
 
     // include the value of the embedded control as part of the text alternative in the
@@ -80,7 +80,7 @@ const computedText = (node, textAlternatives = {}, recursive = false, force = fa
   }
 
   // 2B (ARIA version).
-  if (recursive && elementIsAriaWidget(element)) {
+  if (elementIsAriaWidget(element)) {
     const role = element.getAttribute('role');
     // If the embedded control is a text field, use its value.
     if (role === 'textbox') {
@@ -108,7 +108,7 @@ const computedText = (node, textAlternatives = {}, recursive = false, force = fa
         }
       });
       if (selectedMenuitems.length > 0) {
-        selectedMenuitems.map(selectedMenuitem => computedText(selectedMenuitem, {}, true));
+        selectedMenuitems.map(selectedMenuitem => computedText(selectedMenuitem));
         return selectedMenuitems.join(', ');
       }
     }

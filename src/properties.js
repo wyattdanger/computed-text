@@ -17,7 +17,7 @@ const getTextFromAriaLabelledby = (element) => {
     if (!labelledbyElement) {
       throw new Error(`Expected element with id ${labelledbyId}`);
     } else {
-      labelledbyValues.push(computedText(labelledbyElement, {}, true, true));
+      labelledbyValues.push(computedText(labelledbyElement, {}, true));
     }
   }
 
@@ -65,7 +65,7 @@ const getTextFromDescendantContent = (element, force) => {
   const children = element.childNodes;
   const childrenTextContent = [];
   for (let i = 0; i < children.length; i++) {
-    const childTextContent = computedText(children[i], {}, true, force);
+    const childTextContent = computedText(children[i], {}, force);
     if (childTextContent) { childrenTextContent.push(childTextContent.trim()); }
   }
   if (childrenTextContent.length) {
