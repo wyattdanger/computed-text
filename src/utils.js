@@ -27,10 +27,6 @@ const elementIsHtmlControl = (element) => {
 };
 
 const isElementHidden = (element) => {
-  if (!(element instanceof element.ownerDocument.defaultView.HTMLElement)) {
-    return false;
-  }
-
   const style = window.getComputedStyle(element, null);
   if (style.display === 'none' || style.visibility === 'hidden') {
     return true;

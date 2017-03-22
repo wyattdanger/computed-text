@@ -29,7 +29,7 @@ const findTextAlternatives = (node, textAlternatives = {}, recursive = false, fo
   // 2A. The aria-labelledby attribute takes precedence as the element's text alternative
   // unless this computation is already occurring as the result of a recursive aria-labelledby
   // declaration.
-  const ariaLabelledBy = getTextFromAriaLabelledby(element, textAlternatives);
+  const ariaLabelledBy = getTextFromAriaLabelledby(element);
   if (ariaLabelledBy) {
     return ariaLabelledBy;
   }
