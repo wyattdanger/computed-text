@@ -119,4 +119,27 @@ describe('findTextAlternatives', () => {
     expect(textAlternatives.ariaLabelledby.text).toBe('Learn more about trout fishing');
     expect(result).toBe('Learn more about trout fishing');
   });
+
+  test('Text node', () => {
+    const text = 'Hello World';
+    document.body.appendChild(document.createTextNode(text));
+    const textAlternatives = {};
+    const result = findTextAlternatives(document.body, textAlternatives);
+    expect(Object.keys(textAlternatives).length).toBe(1);
+    expect(result).toBe(text);
+  });
+
+  test('Returns null if no node', () => {
+    expect(findTextAlternatives(null)).toBe(null);
+  });
+
+  test('Returns null for hidden nodes', () => {
+    const node = document.body.appendChild(document.createElement('div'));
+    node.style.display = 'none';
+    node.innerText = 'Hello World';
+    const textAlternatives = {};
+    const result = findTextAlternatives(node, textAlternatives);
+    expect(Object.keys(textAlternatives).length).toBe(0);
+    expect(result).toBe(null);
+  });
 });
