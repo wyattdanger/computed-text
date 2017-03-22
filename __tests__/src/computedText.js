@@ -128,6 +128,30 @@ describe('computedText', () => {
     expect(result).toBe('Hello World is this thing on? Foo Aria Label Why Submit Text Node');
   });
 
+  test('select tags with no option selected', () => {
+    document.body.innerHTML = `
+      <label for="foo">Foo</label>
+      <select name="foo" id="foo">
+        <option value="1">One</option>
+        <option value="2">Two</option>
+        <option value="3">Three</option>
+      </select>
+    `;
+    expect(computedText(document.body)).toBe('Foo 1');
+  });
+
+  test('select tags with an option selected', () => {
+    document.body.innerHTML = `
+      <label for="foo">Foo</label>
+      <select name="foo" id="foo">
+        <option value="1">One</option>
+        <option value="2">Two</option>
+        <option value="3" selected>Three</option>
+      </select>
+    `;
+    expect(computedText(document.body)).toBe('Foo 3');
+  });
+
   test('skips comments', () => {
     document.body.innerHTML = `
       <!-- Comment -->
