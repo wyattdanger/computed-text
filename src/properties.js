@@ -14,47 +14,28 @@ const getLastWord = (text) => {
   return text.substring(wordStart);
 };
 
-const getTextFromAriaLabelledby = (element, textAlternatives) => {
-  let computedName = null;
-
+const getTextFromAriaLabelledby = (element) => {
   if (!element.hasAttribute('aria-labelledby')) {
-    return computedName;
+    return null;
   }
 
+  let computedName = null;
   const labelledbyAttr = element.getAttribute('aria-labelledby');
   const labelledbyIds = labelledbyAttr.split(/\s+/);
-  const labelledbyValue = {};
-  labelledbyValue.valid = true;
-  const labelledbyText = [];
   const labelledbyValues = [];
 
   for (let i = 0; i < labelledbyIds.length; i++) {
-    const labelledby = {};
-    labelledby.type = 'element';
     const labelledbyId = labelledbyIds[i];
-    labelledby.value = labelledbyId;
     const labelledbyElement = document.getElementById(labelledbyId);
     if (!labelledbyElement) {
-      labelledby.valid = false;
-      labelledbyValue.valid = false;
-      labelledby.errorMessage = { messageKey: 'noElementWithId', args: [labelledbyId] };
+      throw new Error(`Expected element with id ${labelledbyId}`);
     } else {
-      labelledby.valid = true;
-      labelledby.text = findTextAlternatives(labelledbyElement, {}, true, true);
-      labelledby.lastWord = getLastWord(labelledby.text);
-      labelledbyText.push(labelledby.text);
-      labelledby.element = labelledbyElement;
+      labelledbyValues.push(findTextAlternatives(labelledbyElement, {}, true, true));
     }
-    labelledbyValues.push(labelledby);
   }
 
   if (labelledbyValues.length > 0) {
-    labelledbyValues[labelledbyValues.length - 1].last = true;
-    labelledbyValue.values = labelledbyValues;
-    labelledbyValue.text = labelledbyText.join(' ');
-    labelledbyValue.lastWord = getLastWord(labelledbyValue.text);
-    computedName = labelledbyValue.text;
-    textAlternatives.ariaLabelledby = labelledbyValue;
+    computedName = labelledbyValues.join(' ');
   }
 
   return computedName;
@@ -62,10 +43,6 @@ const getTextFromAriaLabelledby = (element, textAlternatives) => {
 
 const getTextFromHostLanguageAttributes = (element, existingComputedname = null, recursive) => {
   let computedName = existingComputedname;
-
-  if (element.hasAttribute('aria-label')) {
-    return element.getAttribute('aria-label');
-  }
 
   if (element.matches('img') && element.hasAttribute('alt')) {
     computedName = element.getAttribute('alt');

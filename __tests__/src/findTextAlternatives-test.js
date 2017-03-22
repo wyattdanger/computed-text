@@ -44,17 +44,15 @@ describe('findTextAlternatives', () => {
   });
 
   test('Image with aria labelledby', () => {
+    const id = 'id';
     const img = document.body.appendChild(document.createElement('img'));
     img.src = 'smile.jpg';
     const label = document.body.appendChild(document.createElement('div'));
     label.textContent = 'Smile!';
-    label.id = 'label';
-    img.setAttribute('aria-labelledby', 'label');
-    const textAlternatives = {};
-    findTextAlternatives(img, textAlternatives);
-    expect(Object.keys(textAlternatives).length).toBe(1);
-    expect('ariaLabelledby' in textAlternatives).toBe(true);
-    expect('Smile!').toBe(textAlternatives.ariaLabelledby.text);
+    label.id = id;
+    img.setAttribute('aria-labelledby', id);
+    const result = findTextAlternatives(img);
+    expect(result).toBe('Smile!');
   });
 
   test('Image with title', () => {
@@ -70,11 +68,7 @@ describe('findTextAlternatives', () => {
     const anchor = document.body.appendChild(document.createElement('a'));
     anchor.href = '#';
     anchor.innerHTML = '<span aria-hidden="true">X</span><span>Close this window</span>';
-    const textAlternatives = {};
-    const result = findTextAlternatives(anchor, textAlternatives);
-    expect(Object.keys(textAlternatives).length).toBe(1);
-    expect('content' in textAlternatives).toBe(true);
-    expect(textAlternatives.content.text).toBe('Close this window');
+    const result = findTextAlternatives(anchor);
     expect(result).toBe('Close this window');
   });
 
@@ -83,12 +77,7 @@ describe('findTextAlternatives', () => {
     anchor.href = '#';
     anchor.setAttribute('aria-labelledby', 'foobar');
     anchor.innerHTML = '<span id="foobar" aria-hidden="true">X</span><span>Close this window</span>';
-    const textAlternatives = {};
-    const result = findTextAlternatives(anchor, textAlternatives);
-    expect(Object.keys(textAlternatives).length).toBe(2);
-    expect('ariaLabelledby' in textAlternatives).toBe(true);
-    expect(textAlternatives.content.text).toBe('Close this window');
-    expect(textAlternatives.ariaLabelledby.text).toBe('X');
+    const result = findTextAlternatives(anchor);
     expect(result).toBe('X');
   });
 
@@ -99,20 +88,14 @@ describe('findTextAlternatives', () => {
     const label = document.body.appendChild(document.createElement('span'));
     label.setAttribute('id', 'foobar');
     label.setAttribute('aria-label', 'Learn more about trout fishing');
-    const textAlternatives = {};
-    const result = findTextAlternatives(anchor, textAlternatives);
-    expect(Object.keys(textAlternatives).length).toBe(1);
-    expect('ariaLabelledby' in textAlternatives).toBe(true);
-    expect(textAlternatives.ariaLabelledby.text).toBe('Learn more about trout fishing');
+    const result = findTextAlternatives(anchor);
     expect(result).toBe('Learn more about trout fishing');
   });
 
   test('Text node', () => {
     const text = 'Hello World';
     document.body.appendChild(document.createTextNode(text));
-    const textAlternatives = {};
-    const result = findTextAlternatives(document.body, textAlternatives);
-    expect(Object.keys(textAlternatives).length).toBe(1);
+    const result = findTextAlternatives(document.body);
     expect(result).toBe(text);
   });
 
@@ -124,9 +107,7 @@ describe('findTextAlternatives', () => {
     const node = document.body.appendChild(document.createElement('div'));
     node.style.display = 'none';
     node.innerText = 'Hello World';
-    const textAlternatives = {};
-    const result = findTextAlternatives(node, textAlternatives);
-    expect(Object.keys(textAlternatives).length).toBe(0);
+    const result = findTextAlternatives(node);
     expect(result).toBe(null);
   });
 
@@ -143,8 +124,7 @@ describe('findTextAlternatives', () => {
     <div role="presentation">Ignore Me?</div>
     Text Node
     `;
-    const textAlternatives = {};
-    const result = findTextAlternatives(document.body, textAlternatives);
+    const result = findTextAlternatives(document.body);
     expect(result).toBe('Hello World is this thing on? Foo Aria Label Why Submit Text Node');
   });
 });

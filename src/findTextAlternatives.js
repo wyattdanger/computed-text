@@ -26,26 +26,19 @@ const findTextAlternatives = (node, textAlternatives = {}, recursive = false, fo
 
   let computedName = null;
 
-  if (!recursive) {
-    // 2A. The aria-labelledby attribute takes precedence as the element's text alternative
-    // unless this computation is already occurring as the result of a recursive aria-labelledby
-    // declaration.
-    computedName = getTextFromAriaLabelledby(element, textAlternatives);
+  // 2A. The aria-labelledby attribute takes precedence as the element's text alternative
+  // unless this computation is already occurring as the result of a recursive aria-labelledby
+  // declaration.
+  const ariaLabelledBy = getTextFromAriaLabelledby(element, textAlternatives);
+  if (ariaLabelledBy) {
+    return ariaLabelledBy;
   }
 
   // 2A. If aria-labelledby is empty or undefined, the aria-label attribute, which defines an
   // explicit text string, is used.
-  if (element.hasAttribute('aria-label')) {
-    const ariaLabelValue = {};
-    ariaLabelValue.type = 'text';
-    ariaLabelValue.text = element.getAttribute('aria-label');
-    ariaLabelValue.lastWord = getLastWord(ariaLabelValue.text);
-    if (computedName) {
-      ariaLabelValue.unused = true;
-    } else if (!(recursive && elementIsHtmlControl(element))) {
-      computedName = ariaLabelValue.text;
-    }
-    textAlternatives.ariaLabel = ariaLabelValue;
+  const ariaLabel = element.getAttribute('aria-label');
+  if (ariaLabel) {
+    return ariaLabel;
   }
 
   // 2A. If aria-labelledby and aria-label are both empty or undefined, and if the element is not
@@ -53,7 +46,10 @@ const findTextAlternatives = (node, textAlternatives = {}, recursive = false, fo
   // language attribute or element for associating a label, and use those mechanisms to determine
   // a text alternative.
   if (!element.hasAttribute('role') || element.getAttribute('role') !== 'presentation') {
-    computedName = getTextFromHostLanguageAttributes(element, computedName, recursive);
+    const textFromAttributes = getTextFromHostLanguageAttributes(element, computedName, recursive);
+    if (textFromAttributes) {
+      return textFromAttributes;
+    }
   }
 
   // 2B (HTML version).
