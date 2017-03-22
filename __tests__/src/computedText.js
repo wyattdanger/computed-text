@@ -144,4 +144,24 @@ describe('computedText', () => {
     `;
     expect(computedText(document.body)).toBe(null);
   });
+
+  test('input wrapped in a label with no value', () => {
+    document.body.innerHTML = `
+      <label>
+        Foo
+        <input type="text" name="foo" />
+      </label>
+    `;
+    expect(computedText(document.body)).toBe('Foo');
+  });
+
+  test('input wrapped in a label with a value', () => {
+    document.body.innerHTML = `
+      <label>
+        Foo
+        <input type="text" name="foo" value="Bar" />
+      </label>
+    `;
+    expect(computedText(document.body)).toBe('Foo Bar');
+  });
 });
