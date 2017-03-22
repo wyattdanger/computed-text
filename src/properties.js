@@ -1,6 +1,6 @@
 /* eslint no-param-reassign:0, no-use-before-define:0 no-plusplus:0 */
 
-import findTextAlternatives from './findTextAlternatives';
+import computedText from './computedText';
 import { parentElement } from './domUtils';
 
 const getLastWord = (text) => {
@@ -30,7 +30,7 @@ const getTextFromAriaLabelledby = (element) => {
     if (!labelledbyElement) {
       throw new Error(`Expected element with id ${labelledbyId}`);
     } else {
-      labelledbyValues.push(findTextAlternatives(labelledbyElement, {}, true, true));
+      labelledbyValues.push(computedText(labelledbyElement, {}, true, true));
     }
   }
 
@@ -69,7 +69,7 @@ const getTextFromHostLanguageAttributes = (element, existingComputedname = null,
         const labelFor = {};
         labelFor.type = 'element';
         const label = labelsFor[i];
-        const labelText = findTextAlternatives(label, {}, true);
+        const labelText = computedText(label, {}, true);
         if (labelText && labelText.trim().length > 0) {
           labelFor.text = labelText.trim();
           labelForText.push(labelText.trim());
@@ -97,7 +97,7 @@ const getTextFromHostLanguageAttributes = (element, existingComputedname = null,
         const parentLabel = parent;
         if (parentLabel.control === element) {
           labelWrappedValue.type = 'element';
-          labelWrappedValue.text = findTextAlternatives(parentLabel, {}, true);
+          labelWrappedValue.text = computedText(parentLabel, {}, true);
           labelWrappedValue.lastWord = getLastWord(labelWrappedValue.text);
           labelWrappedValue.element = parentLabel;
           break;
@@ -127,7 +127,7 @@ const getTextFromDescendantContent = (element, force) => {
   const children = element.childNodes;
   const childrenTextContent = [];
   for (let i = 0; i < children.length; i++) {
-    const childTextContent = findTextAlternatives(children[i], {}, true, force);
+    const childTextContent = computedText(children[i], {}, true, force);
     if (childTextContent) { childrenTextContent.push(childTextContent.trim()); }
   }
   if (childrenTextContent.length) {

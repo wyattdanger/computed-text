@@ -6,7 +6,7 @@ import { elementIsAriaWidget, elementIsHtmlControl, isElementOrAncestorHidden } 
 import constants from './constants';
 
 
-const findTextAlternatives = (node, textAlternatives = {}, recursive = false, force = false) => {
+const computedText = (node, textAlternatives = {}, recursive = false, force = false) => {
   const element = asElement(node);
 
   if (!element) {
@@ -120,7 +120,7 @@ const findTextAlternatives = (node, textAlternatives = {}, recursive = false, fo
         }
       });
       if (selectedMenuitems.length > 0) {
-        selectedMenuitems.map(selectedMenuitem => findTextAlternatives(selectedMenuitem, {}, true));
+        selectedMenuitems.map(selectedMenuitem => computedText(selectedMenuitem, {}, true));
         textAlternatives.controlValue = { text: selectedMenuitems.join(', ') };
       }
     }
@@ -177,4 +177,4 @@ const findTextAlternatives = (node, textAlternatives = {}, recursive = false, fo
   return computedName;
 };
 
-export default findTextAlternatives;
+export default computedText;

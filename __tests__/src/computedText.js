@@ -1,6 +1,6 @@
-import findTextAlternatives from '../../src/findTextAlternatives';
+import computedText from '../../src/computedText';
 
-describe('findTextAlternatives', () => {
+describe('computedText', () => {
   beforeEach(() => {
     document.body.innerHTML = '';
   });
@@ -8,13 +8,13 @@ describe('findTextAlternatives', () => {
   test('returns the calculated text alternative for the given element', () => {
     const targetNode = document.createElement('select');
     document.body.appendChild(targetNode);
-    expect(findTextAlternatives(targetNode, {}, true)).toBe('');
+    expect(computedText(targetNode, {}, true)).toBe('');
   });
 
   test('Image with no text alternative', () => {
     const img = document.body.appendChild(document.createElement('img'));
     img.src = 'smile.jpg';
-    const result = findTextAlternatives(img);
+    const result = computedText(img);
     expect(result).toBe('smile.jpg');
   });
 
@@ -22,7 +22,7 @@ describe('findTextAlternatives', () => {
     const img = document.body.appendChild(document.createElement('img'));
     img.src = 'smile.jpg';
     img.alt = 'Smile!';
-    const result = findTextAlternatives(img);
+    const result = computedText(img);
     expect(result).toBe('Smile!');
   });
 
@@ -31,7 +31,7 @@ describe('findTextAlternatives', () => {
     img.type = 'image';
     img.src = 'smile.jpg';
     img.alt = 'Smile!';
-    const result = findTextAlternatives(img);
+    const result = computedText(img);
     expect(result).toBe('Smile!');
   });
 
@@ -39,7 +39,7 @@ describe('findTextAlternatives', () => {
     const img = document.body.appendChild(document.createElement('img'));
     img.src = 'smile.jpg';
     img.setAttribute('aria-label', 'Smile!');
-    const result = findTextAlternatives(img);
+    const result = computedText(img);
     expect(result).toBe('Smile!');
   });
 
@@ -51,7 +51,7 @@ describe('findTextAlternatives', () => {
     label.textContent = 'Smile!';
     label.id = id;
     img.setAttribute('aria-labelledby', id);
-    const result = findTextAlternatives(img);
+    const result = computedText(img);
     expect(result).toBe('Smile!');
   });
 
@@ -59,7 +59,7 @@ describe('findTextAlternatives', () => {
     const img = document.body.appendChild(document.createElement('img'));
     img.src = 'smile.jpg';
     img.setAttribute('title', 'Smile!');
-    const result = findTextAlternatives(img);
+    const result = computedText(img);
     expect(result).toBe('Smile!');
   });
 
@@ -68,7 +68,7 @@ describe('findTextAlternatives', () => {
     const anchor = document.body.appendChild(document.createElement('a'));
     anchor.href = '#';
     anchor.innerHTML = '<span aria-hidden="true">X</span><span>Close this window</span>';
-    const result = findTextAlternatives(anchor);
+    const result = computedText(anchor);
     expect(result).toBe('Close this window');
   });
 
@@ -77,7 +77,7 @@ describe('findTextAlternatives', () => {
     anchor.href = '#';
     anchor.setAttribute('aria-labelledby', 'foobar');
     anchor.innerHTML = '<span id="foobar" aria-hidden="true">X</span><span>Close this window</span>';
-    const result = findTextAlternatives(anchor);
+    const result = computedText(anchor);
     expect(result).toBe('X');
   });
 
@@ -88,26 +88,26 @@ describe('findTextAlternatives', () => {
     const label = document.body.appendChild(document.createElement('span'));
     label.setAttribute('id', 'foobar');
     label.setAttribute('aria-label', 'Learn more about trout fishing');
-    const result = findTextAlternatives(anchor);
+    const result = computedText(anchor);
     expect(result).toBe('Learn more about trout fishing');
   });
 
   test('Text node', () => {
     const text = 'Hello World';
     document.body.appendChild(document.createTextNode(text));
-    const result = findTextAlternatives(document.body);
+    const result = computedText(document.body);
     expect(result).toBe(text);
   });
 
   test('Returns null if no node', () => {
-    expect(findTextAlternatives(null)).toBe(null);
+    expect(computedText(null)).toBe(null);
   });
 
   test('Returns null for hidden nodes', () => {
     const node = document.body.appendChild(document.createElement('div'));
     node.style.display = 'none';
     node.innerText = 'Hello World';
-    const result = findTextAlternatives(node);
+    const result = computedText(node);
     expect(result).toBe(null);
   });
 
@@ -124,7 +124,7 @@ describe('findTextAlternatives', () => {
     <div role="presentation">Ignore Me?</div>
     Text Node
     `;
-    const result = findTextAlternatives(document.body);
+    const result = computedText(document.body);
     expect(result).toBe('Hello World is this thing on? Foo Aria Label Why Submit Text Node');
   });
 });
