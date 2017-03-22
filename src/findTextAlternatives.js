@@ -1,6 +1,6 @@
 /* eslint no-param-reassign:0 */
 
-import properties from './properties';
+import { getLastWord, getTextFromAriaLabelledby, getTextFromDescendantContent, getTextFromHostLanguageAttributes } from './properties';
 import { asElement } from './domUtils';
 import { elementIsAriaWidget, elementIsHtmlControl, isElementOrAncestorHidden } from './utils';
 import constants from './constants';

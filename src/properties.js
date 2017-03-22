@@ -172,7 +172,9 @@ const findTextAlternatives = (node, textAlternatives, recursive = false, force) 
     textAlternatives.title = titleValue;
   }
 
-  if (Object.keys(textAlternatives).length === 0 && computedName === null) { return null; }
+  if (Object.keys(textAlternatives).length === 0 && !computedName) {
+    return null;
+  }
 
   return computedName;
 };
@@ -234,7 +236,7 @@ const getTextFromAriaLabelledby = (element, textAlternatives) => {
 };
 
 const getTextFromHostLanguageAttributes = (
-  element, textAlternatives, existingComputedname, recursive,
+  element, textAlternatives = {}, existingComputedname, recursive,
 ) => {
   let computedName = existingComputedname;
   if (matchSelector(element, 'img') && element.hasAttribute('alt')) {
@@ -316,7 +318,9 @@ const getTextFromHostLanguageAttributes = (
       if (computedName) { altValue.unused = true; } else { computedName = altValue.text; }
       textAlternatives.alt = altValue;
     }
-    if (!Object.keys(textAlternatives).length) { textAlternatives.noLabel = true; }
+    if (!Object.keys(textAlternatives).length) {
+      textAlternatives.noLabel = true;
+    }
   }
   return computedName;
 };
@@ -339,7 +343,7 @@ const getTextFromDescendantContent = (element, force) => {
   return null;
 };
 
-export default {
+export {
   getLastWord,
   getTextFromAriaLabelledby,
   getTextFromHostLanguageAttributes,

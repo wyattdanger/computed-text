@@ -69,6 +69,9 @@ const parentElement = (node) => {
 
 const asElement = (node) => {
   let element;
+  if (!node) {
+    return null;
+  }
   switch (node.nodeType) {
     case Node.COMMENT_NODE:
       return null;  // Skip comments
@@ -88,7 +91,7 @@ const asElement = (node) => {
   return null;
 };
 
-export default {
+export {
   asElement,
   shadowHost,
   parentElement,

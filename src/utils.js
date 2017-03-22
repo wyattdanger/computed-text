@@ -77,7 +77,7 @@ const matchSelector = (element, selector) => {
   return false;
 };
 
-export default {
+export {
   elementIsAriaWidget,
   elementIsHtmlControl,
   isElementOrAncestorHidden,

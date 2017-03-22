@@ -1,2 +1,3 @@
-const importTextAlternatives = require('./findTextAlternatives');
+import importTextAlternatives from './src/findTextAlternatives';
+
 module.exports = importTextAlternatives;
