@@ -62,33 +62,32 @@ const parentElement = (node) => {
   switch (parentNode.nodeType) {
     case Node.ELEMENT_NODE:
       return parentNode;
+    case Node.DOCUMENT_NODE:
+      return null;
     default:
       return parentElement(parentNode);
   }
 };
 
 const asElement = (node) => {
-  let element;
   if (!node) {
     return null;
   }
   switch (node.nodeType) {
     case Node.COMMENT_NODE:
-      return null;  // Skip comments
+      return null;
     case Node.ELEMENT_NODE:
-      element = node;
-      if (element.localName === 'script' || element.localName === 'template') {
-        return null;  // Skip script-supporting elements
+      if (node.localName === 'script' || node.localName === 'template') {
+        return null;
       }
-      return element;
+      return node;
     case Node.DOCUMENT_FRAGMENT_NODE:
       return node.host;
     case Node.TEXT_NODE:
       return parentElement(node);
     default:
-      console.warn('Unhandled node type: ', node.nodeType);
+      return null;
   }
-  return null;
 };
 
 export {

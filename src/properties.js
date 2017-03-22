@@ -1,7 +1,6 @@
 /* eslint no-param-reassign:0, no-use-before-define:0 no-plusplus:0 */
 
 import computedText from './computedText';
-import { parentElement } from './domUtils';
 
 const getTextFromAriaLabelledby = (element) => {
   if (!element.hasAttribute('aria-labelledby')) {
@@ -29,7 +28,7 @@ const getTextFromAriaLabelledby = (element) => {
   return null;
 };
 
-const getTextFromHostLanguageAttributes = (element, { recursive = false } = {}) => {
+const getTextFromHostLanguageAttributes = (element) => {
   if (element.matches('img') && element.hasAttribute('alt')) {
     return element.getAttribute('alt');
   }
@@ -38,52 +37,22 @@ const getTextFromHostLanguageAttributes = (element, { recursive = false } = {}) 
     return element.getAttribute('title') || element.getAttribute('src');
   }
 
-  const controlsSelector = ['input:not([type="hidden"]):not([disabled])',
+  const controlsSelector = [
+    'input:not([type="hidden"]):not([disabled])',
     'select:not([disabled])',
     'textarea:not([disabled])',
     'button:not([disabled])',
-    'video:not([disabled])'].join(', ');
+    'video:not([disabled])',
+  ].join(', ');
 
-  if (element.matches(controlsSelector) && !recursive) {
-    if (element.hasAttribute('id')) {
-      const labelForQuerySelector = `label[for="${element.id}"]`;
-      const labelsFor = document.querySelectorAll(labelForQuerySelector);
-      const labelForValues = [];
-      const labelForText = [];
-      for (let i = 0; i < labelsFor.length; i++) {
-        const labelFor = {};
-        labelFor.type = 'element';
-        const label = labelsFor[i];
-        const labelText = computedText(label, {}, true);
-        if (labelText && labelText.trim().length > 0) {
-          labelFor.text = labelText.trim();
-          labelForText.push(labelText.trim());
-        }
-        labelFor.element = label;
-        labelForValues.push(labelFor);
-      }
-      if (labelForValues.length > 0) {
-        return labelForText.join(' ');
-      }
+  if (element.matches(controlsSelector)) {
+    const labels = Array.from(document.querySelectorAll('label'));
+    const label = labels.find(node => node.control === element);
+
+    if (label) {
+      return computedText(label);
     }
 
-    let parent = parentElement(element);
-    const labelWrappedValue = {};
-    while (parent) {
-      if (parent.tagName.toLowerCase() === 'label') {
-        const parentLabel = parent;
-        if (parentLabel.control === element) {
-          labelWrappedValue.type = 'element';
-          labelWrappedValue.text = computedText(parentLabel, {}, true);
-          labelWrappedValue.element = parentLabel;
-          break;
-        }
-      }
-      parent = parentElement(parent);
-    }
-    if (labelWrappedValue.text) {
-      return labelWrappedValue.text;
-    }
     if (element.matches('input[type="image"]') && element.hasAttribute('alt')) {
       const alt = element.getAttribute('alt');
       return alt;

@@ -21,7 +21,9 @@ describe('computedText', () => {
 
   test('Input type image with alt text', () => {
     document.body.innerHTML = `
-      <input type="image" src="smile.jpg" alt="Smile!" />
+    <form>
+      <input type="image" src="smile.jpg" alt="Smile!" id="foo" />
+      </form>
     `;
     expect(computedText(document.body)).toBe('Smile!');
   });

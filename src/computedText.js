@@ -44,7 +44,7 @@ const computedText = (node, textAlternatives = {}, recursive = false, force = fa
   // language attribute or element for associating a label, and use those mechanisms to determine
   // a text alternative.
   if (!element.hasAttribute('role') || element.getAttribute('role') !== 'presentation') {
-    const textFromAttributes = getTextFromHostLanguageAttributes(element, { recursive });
+    const textFromAttributes = getTextFromHostLanguageAttributes(element);
     if (textFromAttributes) {
       return textFromAttributes;
     }
