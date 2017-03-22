@@ -1,13 +1,13 @@
+/* eslint no-param-reassign:0 */
+
 import properties from './properties';
-import asElement from './asElement';
-import utils from './utils';
+import { asElement } from './domUtils';
+import { elementIsAriaWidget, elementIsHtmlControl, isElementOrAncestorHidden } from './utils';
 import constants from './constants';
 
-var foo = ['bar';
-foo;
 
 const findTextAlternatives = (node, textAlternatives, recursive = false, force = false) => {
-  const element = dom.asElement(node);
+  const element = asElement(node);
 
   if (!element) {
     return null;
@@ -15,7 +15,7 @@ const findTextAlternatives = (node, textAlternatives, recursive = false, force =
 
   // 1. Skip hidden elements unless the author specifies to use them via an aria-labelledby or
   // aria-describedby being used in the current computation.
-  if (!force && utils.isElementOrAncestorHidden(element)) {
+  if (!force && isElementOrAncestorHidden(element)) {
     return null;
   }
 
@@ -24,7 +24,7 @@ const findTextAlternatives = (node, textAlternatives, recursive = false, force =
     const textContentValue = {};
     textContentValue.type = 'text';
     textContentValue.text = node.textContent;
-    textContentValue.lastWord = properties.getLastWord(textContentValue.text);
+    textContentValue.lastWord = getLastWord(textContentValue.text);
     textAlternatives.content = textContentValue;
 
     return node.textContent;
@@ -36,7 +36,7 @@ const findTextAlternatives = (node, textAlternatives, recursive = false, force =
     // 2A. The aria-labelledby attribute takes precedence as the element's text alternative
     // unless this computation is already occurring as the result of a recursive aria-labelledby
     // declaration.
-    computedName = properties.getTextFromAriaLabelledby(element, textAlternatives);
+    computedName = getTextFromAriaLabelledby(element, textAlternatives);
   }
 
   // 2A. If aria-labelledby is empty or undefined, the aria-label attribute, which defines an
@@ -45,10 +45,10 @@ const findTextAlternatives = (node, textAlternatives, recursive = false, force =
     const ariaLabelValue = {};
     ariaLabelValue.type = 'text';
     ariaLabelValue.text = element.getAttribute('aria-label');
-    ariaLabelValue.lastWord = properties.getLastWord(ariaLabelValue.text);
+    ariaLabelValue.lastWord = getLastWord(ariaLabelValue.text);
     if (computedName) {
       ariaLabelValue.unused = true;
-    } else if (!(recursive && utils.elementIsHtmlControl(element))) {
+    } else if (!(recursive && elementIsHtmlControl(element))) {
       computedName = ariaLabelValue.text;
     }
     textAlternatives.ariaLabel = ariaLabelValue;
@@ -59,14 +59,14 @@ const findTextAlternatives = (node, textAlternatives, recursive = false, force =
   // language attribute or element for associating a label, and use those mechanisms to determine
   // a text alternative.
   if (!element.hasAttribute('role') || element.getAttribute('role') !== 'presentation') {
-    computedName = properties.getTextFromHostLanguageAttributes(element,
+    computedName = getTextFromHostLanguageAttributes(element,
                                                                     textAlternatives,
                                                                     computedName,
                                                                     recursive);
   }
 
   // 2B (HTML version).
-  if (recursive && utils.elementIsHtmlControl(element)) {
+  if (recursive && elementIsHtmlControl(element)) {
     const defaultView = element.ownerDocument.defaultView;
 
     // include the value of the embedded control as part of the text alternative in the
@@ -76,21 +76,21 @@ const findTextAlternatives = (node, textAlternatives, recursive = false, force =
       const inputElement = /** @type {HTMLInputElement} */ (element);
       if (inputElement.type === 'text') {
         if (inputElement.value && inputElement.value.length > 0) {
-          textAlternatives.controlValue = { 'text': inputElement.value };
+          textAlternatives.controlValue = { text: inputElement.value };
         }
       }
       // If the embedded control is a range (e.g. a spinbutton or slider), use the value of the
       // aria-valuetext attribute if available, or otherwise the value of the aria-valuenow
       // attribute.
       if (inputElement.type === 'range') {
-        textAlternatives.controlValue = { 'text': inputElement.value };
+        textAlternatives.controlValue = { text: inputElement.value };
       }
     }
     // If the embedded control is a menu, use the text alternative of the chosen menu item.
     // If the embedded control is a select or combobox, use the chosen option.
     if (element instanceof defaultView.HTMLSelectElement) {
       const inputElement = /** @type {HTMLSelectElement} */ (element);
-      textAlternatives.controlValue = { 'text': inputElement.value };
+      textAlternatives.controlValue = { text: inputElement.value };
     }
 
     if (textAlternatives.controlValue) {
@@ -104,12 +104,12 @@ const findTextAlternatives = (node, textAlternatives, recursive = false, force =
   }
 
   // 2B (ARIA version).
-  if (recursive && utils.elementIsAriaWidget(element)) {
+  if (recursive && elementIsAriaWidget(element)) {
     const role = element.getAttribute('role');
     // If the embedded control is a text field, use its value.
     if (role === 'textbox') {
       if (element.textContent && element.textContent.length > 0) {
-        textAlternatives.controlValue = { 'text': element.textContent };
+        textAlternatives.controlValue = { text: element.textContent };
       }
     }
     // If the embedded control is a range (e.g. a spinbutton or slider), use the value of the
@@ -117,30 +117,30 @@ const findTextAlternatives = (node, textAlternatives, recursive = false, force =
     // attribute.
     if (role === 'slider' || role === 'spinbutton') {
       if (element.hasAttribute('aria-valuetext')) {
-        textAlternatives.controlValue = { 'text': element.getAttribute('aria-valuetext') };
+        textAlternatives.controlValue = { text: element.getAttribute('aria-valuetext') };
       } else if (element.hasAttribute('aria-valuenow')) {
-        textAlternatives.controlValue = { 'value': element.getAttribute('aria-valuenow'),
-          'text': '' + element.getAttribute('aria-valuenow') };
+        textAlternatives.controlValue = { value: element.getAttribute('aria-valuenow'),
+          text: `${element.getAttribute('aria-valuenow')}` };
       }
     }
     // If the embedded control is a menu, use the text alternative of the chosen menu item.
     if (role === 'menu') {
       const menuitems = element.querySelectorAll('[role=menuitemcheckbox], [role=menuitemradio]');
       const selectedMenuitems = [];
-      menuitems.forEach(item => {
+      menuitems.forEach((item) => {
         if (item.getAttribute('aria-checked') === 'true') {
           selectedMenuitems.push(item);
         }
       });
       if (selectedMenuitems.length > 0) {
         selectedMenuitems.map(selectedMenuitem => findTextAlternatives(selectedMenuitem, {}, true));
-        textAlternatives.controlValue = { 'text': selectedMenuitems.join(', ') };
+        textAlternatives.controlValue = { text: selectedMenuitems.join(', ') };
       }
     }
     // If the embedded control is a select or combobox, use the chosen option.
     if (role === 'combobox' || role === 'select') {
       // TODO
-      textAlternatives.controlValue = { 'text': 'TODO' };
+      textAlternatives.controlValue = { text: 'TODO' };
     }
 
     if (textAlternatives.controlValue) {
@@ -165,12 +165,12 @@ const findTextAlternatives = (node, textAlternatives, recursive = false, force =
       canGetNameFromContents = false;
     }
   }
-  const textFromContent = properties.getTextFromDescendantContent(element, force);
+  const textFromContent = getTextFromDescendantContent(element, force);
   if (textFromContent && canGetNameFromContents) {
     const textFromContentValue = {};
     textFromContentValue.type = 'text';
     textFromContentValue.text = textFromContent;
-    textFromContentValue.lastWord = properties.getLastWord(textFromContentValue.text);
+    textFromContentValue.lastWord = getLastWord(textFromContentValue.text);
     if (computedName) {
       textFromContentValue.unused = true;
     } else {
@@ -186,7 +186,7 @@ const findTextAlternatives = (node, textAlternatives, recursive = false, force =
     titleValue.type = 'string';
     titleValue.valid = true;
     titleValue.text = element.getAttribute('title');
-    titleValue.lastWord = properties.getLastWord(titleValue.lastWord);
+    titleValue.lastWord = getLastWord(titleValue.lastWord);
     if (computedName) {
       titleValue.unused = true;
     } else {
