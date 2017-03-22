@@ -127,4 +127,11 @@ describe('computedText', () => {
     const result = computedText(document.body);
     expect(result).toBe('Hello World is this thing on? Foo Aria Label Why Submit Text Node');
   });
+
+  test('skips comments', () => {
+    document.body.innerHTML = `
+      <!-- Comment -->
+    `;
+    expect(computedText(document.body)).toBe(null);
+  });
 });
