@@ -11,3 +11,6 @@ test('Contrived example', () => {
   expect(computedText(document.body)).toBe('Hello World Bar');
 });
 ```
+
+Heavily based on the `findTextAlternatives` method in
+[GoogleChrome/accessibility-developer-tools](https://github.com/GoogleChrome/accessibility-developer-tools)
