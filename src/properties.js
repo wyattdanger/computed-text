@@ -3,23 +3,11 @@
 import computedText from './computedText';
 import { parentElement } from './domUtils';
 
-const getLastWord = (text) => {
-  if (!text) { return null; }
-
-  // TODO: this makes a lot of assumptions.
-  const lastSpace = text.lastIndexOf(' ') + 1;
-  const MAXLENGTH = 10;
-  const cutoff = text.length - MAXLENGTH;
-  const wordStart = lastSpace > cutoff ? lastSpace : cutoff;
-  return text.substring(wordStart);
-};
-
 const getTextFromAriaLabelledby = (element) => {
   if (!element.hasAttribute('aria-labelledby')) {
     return null;
   }
 
-  let computedName = null;
   const labelledbyAttr = element.getAttribute('aria-labelledby');
   const labelledbyIds = labelledbyAttr.split(/\s+/);
   const labelledbyValues = [];
@@ -35,21 +23,19 @@ const getTextFromAriaLabelledby = (element) => {
   }
 
   if (labelledbyValues.length > 0) {
-    computedName = labelledbyValues.join(' ');
+    return labelledbyValues.join(' ');
   }
 
-  return computedName;
+  return null;
 };
 
-const getTextFromHostLanguageAttributes = (element, existingComputedname = null, recursive) => {
-  let computedName = existingComputedname;
-
+const getTextFromHostLanguageAttributes = (element, { recursive = false } = {}) => {
   if (element.matches('img') && element.hasAttribute('alt')) {
-    computedName = element.getAttribute('alt');
+    return element.getAttribute('alt');
   }
 
   if (element.matches('img') && !element.hasAttribute('alt')) {
-    computedName = element.getAttribute('title') || element.getAttribute('src');
+    return element.getAttribute('title') || element.getAttribute('src');
   }
 
   const controlsSelector = ['input:not([type="hidden"]):not([disabled])',
@@ -62,7 +48,6 @@ const getTextFromHostLanguageAttributes = (element, existingComputedname = null,
     if (element.hasAttribute('id')) {
       const labelForQuerySelector = `label[for="${element.id}"]`;
       const labelsFor = document.querySelectorAll(labelForQuerySelector);
-      const labelForValue = {};
       const labelForValues = [];
       const labelForText = [];
       for (let i = 0; i < labelsFor.length; i++) {
@@ -78,15 +63,7 @@ const getTextFromHostLanguageAttributes = (element, existingComputedname = null,
         labelForValues.push(labelFor);
       }
       if (labelForValues.length > 0) {
-        labelForValues[labelForValues.length - 1].last = true;
-        labelForValue.values = labelForValues;
-        labelForValue.text = labelForText.join(' ');
-        labelForValue.lastWord = getLastWord(labelForValue.text);
-        if (computedName) {
-          labelForValue.unused = true;
-        } else {
-          computedName = labelForValue.text;
-        }
+        return labelForText.join(' ');
       }
     }
 
@@ -98,7 +75,6 @@ const getTextFromHostLanguageAttributes = (element, existingComputedname = null,
         if (parentLabel.control === element) {
           labelWrappedValue.type = 'element';
           labelWrappedValue.text = computedText(parentLabel, {}, true);
-          labelWrappedValue.lastWord = getLastWord(labelWrappedValue.text);
           labelWrappedValue.element = parentLabel;
           break;
         }
@@ -106,21 +82,14 @@ const getTextFromHostLanguageAttributes = (element, existingComputedname = null,
       parent = parentElement(parent);
     }
     if (labelWrappedValue.text) {
-      if (computedName) {
-        labelWrappedValue.unused = true;
-      } else {
-        computedName = labelWrappedValue.text;
-      }
+      return labelWrappedValue.text;
     }
     if (element.matches('input[type="image"]') && element.hasAttribute('alt')) {
-      const altValue = {};
-      altValue.type = 'string';
-      altValue.valid = true;
-      altValue.text = element.getAttribute('alt');
-      if (computedName) { altValue.unused = true; } else { computedName = altValue.text; }
+      const alt = element.getAttribute('alt');
+      return alt;
     }
   }
-  return computedName;
+  return null;
 };
 
 const getTextFromDescendantContent = (element, force) => {
@@ -142,7 +111,6 @@ const getTextFromDescendantContent = (element, force) => {
 };
 
 export {
-  getLastWord,
   getTextFromAriaLabelledby,
   getTextFromHostLanguageAttributes,
   getTextFromDescendantContent,

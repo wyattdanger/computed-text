@@ -1,6 +1,6 @@
 /* eslint no-param-reassign:0 */
 
-import { getLastWord, getTextFromAriaLabelledby, getTextFromDescendantContent, getTextFromHostLanguageAttributes } from './properties';
+import { getTextFromAriaLabelledby, getTextFromDescendantContent, getTextFromHostLanguageAttributes } from './properties';
 import { asElement } from './domUtils';
 import { elementIsAriaWidget, elementIsHtmlControl, isElementOrAncestorHidden } from './utils';
 import constants from './constants';
@@ -24,8 +24,6 @@ const computedText = (node, textAlternatives = {}, recursive = false, force = fa
     return node.textContent;
   }
 
-  let computedName = null;
-
   // 2A. The aria-labelledby attribute takes precedence as the element's text alternative
   // unless this computation is already occurring as the result of a recursive aria-labelledby
   // declaration.
@@ -46,7 +44,7 @@ const computedText = (node, textAlternatives = {}, recursive = false, force = fa
   // language attribute or element for associating a label, and use those mechanisms to determine
   // a text alternative.
   if (!element.hasAttribute('role') || element.getAttribute('role') !== 'presentation') {
-    const textFromAttributes = getTextFromHostLanguageAttributes(element, computedName, recursive);
+    const textFromAttributes = getTextFromHostLanguageAttributes(element, { recursive });
     if (textFromAttributes) {
       return textFromAttributes;
     }
@@ -63,30 +61,21 @@ const computedText = (node, textAlternatives = {}, recursive = false, force = fa
       const inputElement = /** @type {HTMLInputElement} */ (element);
       if (inputElement.type === 'text') {
         if (inputElement.value && inputElement.value.length > 0) {
-          textAlternatives.controlValue = { text: inputElement.value };
+          return inputElement.value;
         }
       }
       // If the embedded control is a range (e.g. a spinbutton or slider), use the value of the
       // aria-valuetext attribute if available, or otherwise the value of the aria-valuenow
       // attribute.
       if (inputElement.type === 'range') {
-        textAlternatives.controlValue = { text: inputElement.value };
+        return inputElement.value;
       }
     }
     // If the embedded control is a menu, use the text alternative of the chosen menu item.
     // If the embedded control is a select or combobox, use the chosen option.
     if (element instanceof defaultView.HTMLSelectElement) {
       const inputElement = /** @type {HTMLSelectElement} */ (element);
-      textAlternatives.controlValue = { text: inputElement.value };
-    }
-
-    if (textAlternatives.controlValue) {
-      const controlValue = textAlternatives.controlValue;
-      if (computedName) {
-        controlValue.unused = true;
-      } else {
-        computedName = controlValue.text;
-      }
+      return inputElement.value;
     }
   }
 
@@ -96,7 +85,7 @@ const computedText = (node, textAlternatives = {}, recursive = false, force = fa
     // If the embedded control is a text field, use its value.
     if (role === 'textbox') {
       if (element.textContent && element.textContent.length > 0) {
-        textAlternatives.controlValue = { text: element.textContent };
+        return element.textContent;
       }
     }
     // If the embedded control is a range (e.g. a spinbutton or slider), use the value of the
@@ -104,10 +93,9 @@ const computedText = (node, textAlternatives = {}, recursive = false, force = fa
     // attribute.
     if (role === 'slider' || role === 'spinbutton') {
       if (element.hasAttribute('aria-valuetext')) {
-        textAlternatives.controlValue = { text: element.getAttribute('aria-valuetext') };
+        return element.getAttribute('aria-valuetext');
       } else if (element.hasAttribute('aria-valuenow')) {
-        textAlternatives.controlValue = { value: element.getAttribute('aria-valuenow'),
-          text: `${element.getAttribute('aria-valuenow')}` };
+        return element.getAttribute('aria-valuenow');
       }
     }
     // If the embedded control is a menu, use the text alternative of the chosen menu item.
@@ -121,22 +109,13 @@ const computedText = (node, textAlternatives = {}, recursive = false, force = fa
       });
       if (selectedMenuitems.length > 0) {
         selectedMenuitems.map(selectedMenuitem => computedText(selectedMenuitem, {}, true));
-        textAlternatives.controlValue = { text: selectedMenuitems.join(', ') };
+        return selectedMenuitems.join(', ');
       }
     }
     // If the embedded control is a select or combobox, use the chosen option.
     if (role === 'combobox' || role === 'select') {
       // TODO
-      textAlternatives.controlValue = { text: 'TODO' };
-    }
-
-    if (textAlternatives.controlValue) {
-      const controlValue = textAlternatives.controlValue;
-      if (computedName) {
-        controlValue.unused = true;
-      } else {
-        computedName = controlValue.text;
-      }
+      return 'TODO';
     }
   }
 
@@ -154,27 +133,16 @@ const computedText = (node, textAlternatives = {}, recursive = false, force = fa
   }
   const textFromContent = getTextFromDescendantContent(element, force);
   if (textFromContent && canGetNameFromContents) {
-    const textFromContentValue = {};
-    textFromContentValue.type = 'text';
-    textFromContentValue.text = textFromContent;
-    textFromContentValue.lastWord = getLastWord(textFromContentValue.text);
-    if (computedName) {
-      textFromContentValue.unused = true;
-    } else {
-      computedName = textFromContent;
-    }
-    textAlternatives.content = textFromContentValue;
+    return textFromContent;
   }
 
   // 2D. The last resort is to use text from a tooltip attribute (such as the title attribute in
   // HTML). This is used only if nothing else, including subtree content, has provided results.
   if (element.hasAttribute('title')) {
-    if (!computedName) {
-      computedName = element.getAttribute('title');
-    }
+    return element.getAttribute('title');
   }
 
-  return computedName;
+  return null;
 };
 
 export default computedText;
