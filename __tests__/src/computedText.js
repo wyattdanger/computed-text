@@ -164,4 +164,14 @@ describe('computedText', () => {
     `;
     expect(computedText(document.body)).toBe('Foo Bar');
   });
+
+  test('input with type range', () => {
+    document.body.innerHTML = `
+      <label>
+        Foo
+        <input type="range" value="8" />
+      </label>
+    `;
+    expect(computedText(document.body)).toBe('Foo 8');
+  });
 });
