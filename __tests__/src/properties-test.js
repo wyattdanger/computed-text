@@ -1,6 +1,4 @@
 import {
-  getLastWord,
-  getTextFromAriaLabelledby,
   getTextFromHostLanguageAttributes,
   getTextFromDescendantContent,
 } from '../../src/properties';
