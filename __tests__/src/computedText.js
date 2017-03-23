@@ -1,3 +1,4 @@
+/* eslint global-require: 0 */
 import computedText from '../../src/computedText';
 
 describe('computedText', () => {
@@ -173,5 +174,9 @@ describe('computedText', () => {
       </label>
     `;
     expect(computedText(document.body)).toBe('Foo 8');
+  });
+
+  // TODO how to test shadow DOM code?
+  test.skip('accessing shadowDOM content', () => {
   });
 });
