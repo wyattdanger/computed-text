@@ -1,3 +1,5 @@
+![Travis CI](https://travis-ci.org/wyattdanger/computed-text.svg?branch=master)
+
 `computedText(node)` returns an approximation of the text which would be read
 aloud by a screen reader.
 
