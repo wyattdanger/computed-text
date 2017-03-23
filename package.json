@@ -6,7 +6,8 @@
   "scripts": {
     "build": "rimraf build && babel src --out-dir build",
     "lint": "eslint .",
-    "test": "jest --coverage"
+    "test": "npm run lint && jest --coverage",
+    "tests-only": "jest"
   },
   "keywords": [
     "accessibility",
