@@ -6,7 +6,7 @@ import { elementIsAriaWidget, elementIsHtmlControl, isElementOrAncestorHidden } 
 import constants from './constants';
 
 
-const computedText = (node, textAlternatives = {}, force = false) => {
+const computedText = (node, { includeHidden = false } = {}) => {
   const element = asElement(node);
 
   if (!element) {
@@ -15,7 +15,7 @@ const computedText = (node, textAlternatives = {}, force = false) => {
 
   // 1. Skip hidden elements unless the author specifies to use them via an aria-labelledby or
   // aria-describedby being used in the current computation.
-  if (!force && isElementOrAncestorHidden(element)) {
+  if (!includeHidden && isElementOrAncestorHidden(element)) {
     return null;
   }
 
@@ -131,7 +131,7 @@ const computedText = (node, textAlternatives = {}, force = false) => {
       canGetNameFromContents = false;
     }
   }
-  const textFromContent = getTextFromDescendantContent(element, force);
+  const textFromContent = getTextFromDescendantContent(element, { includeHidden });
   if (textFromContent && canGetNameFromContents) {
     return textFromContent;
   }

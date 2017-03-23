@@ -7,25 +7,12 @@ const getTextFromAriaLabelledby = (element) => {
     return null;
   }
 
-  const labelledbyAttr = element.getAttribute('aria-labelledby');
-  const labelledbyIds = labelledbyAttr.split(/\s+/);
-  const labelledbyValues = [];
-
-  for (let i = 0; i < labelledbyIds.length; i++) {
-    const labelledbyId = labelledbyIds[i];
-    const labelledbyElement = document.getElementById(labelledbyId);
-    if (!labelledbyElement) {
-      throw new Error(`Expected element with id ${labelledbyId}`);
-    } else {
-      labelledbyValues.push(computedText(labelledbyElement, {}, true));
-    }
-  }
-
-  if (labelledbyValues.length > 0) {
-    return labelledbyValues.join(' ');
-  }
-
-  return null;
+  return element.getAttribute('aria-labelledby')
+    .split(' ')
+    .map(id => document.getElementById(id))
+    .filter(Boolean)
+    .map(node => computedText(node, { includeHidden: true }))
+    .join(' ');
 };
 
 const getTextFromHostLanguageAttributes = (element) => {
@@ -61,11 +48,11 @@ const getTextFromHostLanguageAttributes = (element) => {
   return null;
 };
 
-const getTextFromDescendantContent = (element, force) => {
+const getTextFromDescendantContent = (element, { includeHidden = false } = {}) => {
   const children = element.childNodes;
   const childrenTextContent = [];
   for (let i = 0; i < children.length; i++) {
-    const childTextContent = computedText(children[i], {}, force);
+    const childTextContent = computedText(children[i], { includeHidden });
     if (childTextContent) { childrenTextContent.push(childTextContent.trim()); }
   }
   if (childrenTextContent.length) {
