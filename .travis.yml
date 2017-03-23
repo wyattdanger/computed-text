@@ -1,18 +1,8 @@
 language: node_js
 node_js:
-  - "7"
-  - "6"
-  - "5"
-  - "4.2.4"
-script:
-  - 'if [ -n "${LINT-}" ]; then npm run lint ; fi'
-  - 'if [ -n "${COVERAGE-}" ]; then npm run coverage ; fi'
-  - 'if [ -n "${TEST-}" ]; then npm run tests-only ; fi'
-sudo: false
-env:
-  - TEST=true
-matrix:
-  fast_finish: true
-  include:
-    - node_js: "node"
-      env: LINT=true
+  - 4
+  - 5
+  - 6
+cache:
+  directories:
+    - node_modules
