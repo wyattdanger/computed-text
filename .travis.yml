@@ -10,6 +10,8 @@ script:
 sudo: false
 env:
   - TEST=true
+notifications:
+  email: false
 matrix:
   fast_finish: true
   include:
