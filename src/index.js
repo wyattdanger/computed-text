@@ -1,3 +1,3 @@
-import importTextAlternatives from './src/computedText';
+import computedText from './computedText';
 
-module.exports = importTextAlternatives;
+module.exports = computedText;
