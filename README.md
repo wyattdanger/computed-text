@@ -18,5 +18,9 @@ npm install
 npm run test
 ```
 
+Use cases:
+- Verify that text which should be visible/invisible to a screen reader is marked up appropriately
+- Run as an approval test in CI to detect changes in the text representation of components
+
 Heavily based on the `findTextAlternatives` method in
 [GoogleChrome/accessibility-developer-tools](https://github.com/GoogleChrome/accessibility-developer-tools)
