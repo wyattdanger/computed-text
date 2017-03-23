@@ -12,5 +12,11 @@ test('Contrived example', () => {
 });
 ```
 
+Local development:
+```bash
+npm install
+npm run test
+```
+
 Heavily based on the `findTextAlternatives` method in
 [GoogleChrome/accessibility-developer-tools](https://github.com/GoogleChrome/accessibility-developer-tools)
