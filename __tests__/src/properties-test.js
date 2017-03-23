@@ -6,20 +6,18 @@ import {
 
 describe('getTextFromDescendantContent', () => {
   test('returns text from the descendants of the element', () => {
-    const html = `<label>
+    document.body.innerHTML = `<label>
       <input type="radio" id="reason_Screenshot" name="reason" value="screenshot"></input>
     </label>`;
-    document.body.innerHTML = html;
-    const targetNode = document.querySelector('label');
-    expect(getTextFromDescendantContent(targetNode)).toBe('');
+    expect(getTextFromDescendantContent(document.body)).toBe(null);
   });
 });
 
 describe('getTextFromHostLanguageAttributes', () => {
   test('does not crash when targetNode has a numeric id attribute', () => {
-    const targetNode = document.createElement('input');
-    targetNode.setAttribute('id', '123_user');
-    document.body.appendChild(targetNode);
-    expect(getTextFromHostLanguageAttributes(targetNode)).toBe(null);
+    document.body.innerHTML = `
+      <input id="123_user" />
+    `;
+    expect(getTextFromHostLanguageAttributes(document.body)).toBe(null);
   });
 });
