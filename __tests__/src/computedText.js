@@ -102,11 +102,13 @@ describe('computedText', () => {
       <h1>Hello World</h1>
       <p>is this thing on?</p>
       <img src="foo.jpg" alt="Foo" />
+      <img role="presentation" src="bar.jpg" />
       <form>
         <input type="text" aria-label="Aria Label" id="bar" value="Bar" />
         <textarea aria-label="Why" value=""></textarea>
         <button type="submit">Submit</button>
       </form>
+      <div aria-hidden="true">Ignore Me?</div>
       <div role="presentation">Ignore Me?</div>
       Text Node
     `;

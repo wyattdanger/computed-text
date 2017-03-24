@@ -48,23 +48,12 @@ const getTextFromHostLanguageAttributes = (element) => {
   return null;
 };
 
-const getTextFromDescendantContent = (element, { includeHidden = false } = {}) => {
-  const children = element.childNodes;
-  const childrenTextContent = [];
-  for (let i = 0; i < children.length; i++) {
-    const childTextContent = computedText(children[i], { includeHidden });
-    if (childTextContent) { childrenTextContent.push(childTextContent.trim()); }
-  }
-  if (childrenTextContent.length) {
-    let result = '';
-    // Empty children are allowed, but collapse all of them
-    for (let i = 0; i < childrenTextContent.length; i++) {
-      result = [result, childrenTextContent[i]].join(' ').trim();
-    }
-    return result;
-  }
-  return null;
-};
+const getTextFromDescendantContent = (element, { includeHidden = false } = {}) =>
+  Array.from(element.childNodes)
+      .map(child => computedText(child, { includeHidden }))
+      .map(text => text && text.trim())
+      .filter(Boolean)
+      .join(' ') || null;
 
 export {
   getTextFromAriaLabelledby,

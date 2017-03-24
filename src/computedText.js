@@ -1,9 +1,9 @@
 /* eslint no-param-reassign:0 */
 
+import { roles } from 'aria-query';
 import { getTextFromAriaLabelledby, getTextFromDescendantContent, getTextFromHostLanguageAttributes } from './properties';
 import { asElement } from './domUtils';
 import { elementIsAriaWidget, elementIsHtmlControl, isElementOrAncestorHidden } from './utils';
-import constants from './constants';
 
 
 const computedText = (node, { includeHidden = false } = {}) => {
@@ -125,15 +125,14 @@ const computedText = (node, { includeHidden = false } = {}) => {
   let canGetNameFromContents = true;
   if (hasRole) {
     const roleName = element.getAttribute('role');
-    // if element has a role, check that it allows "Name From: contents"
-    const role = constants.ARIA_ROLES[roleName];
-    if (role && (!role.namefrom || role.namefrom.indexOf('contents') < 0)) {
+    const role = roles.get(roleName);
+    if (!role.nameFrom.includes('contents')) {
       canGetNameFromContents = false;
     }
   }
-  const textFromContent = getTextFromDescendantContent(element, { includeHidden });
-  if (textFromContent && canGetNameFromContents) {
-    return textFromContent;
+
+  if (canGetNameFromContents) {
+    return getTextFromDescendantContent(element, { includeHidden });
   }
 
   // 2D. The last resort is to use text from a tooltip attribute (such as the title attribute in
